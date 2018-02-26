@@ -6,24 +6,30 @@ const hbs = require('hbs');
 
 
 const PORT = process.env.PORT || 3000;
+const MAINTENANCE = false;
 var app = express();
-var maintenance = true;
+
 
 hbs.registerPartials(__dirname + '/views/partials');
 hbs.registerHelper('getCurrentYear', () => new Date().getFullYear());
 hbs.registerHelper('upperCase', text => text.toUpperCase());
 
 app.set('view engine', 'hbs');
-app.use(express.static(__dirname + '/public'));
 
 app.use((req, res, next) => {
-  if (maintenance) {
+  console.log(`${req.method} ${req.url}`);
+  next();
+});
+
+app.use((req, res, next) => {
+  if (MAINTENANCE) {
     res.render('maintenance.hbs');
   } else {
-    console.log(`${req.method} ${req.url}`);
     next();
   }
 });
+
+app.use(express.static(__dirname + '/public'));
 
 
 app.get('/', (req, res) => {
