@@ -4,6 +4,8 @@
 const express = require('express');
 const hbs = require('hbs');
 
+
+const PORT = process.env.PORT || 3000;
 var app = express();
 var maintenance = true;
 
@@ -37,6 +39,6 @@ app.get('/about', (req, res) => {
   })
 });
 
-app.listen(3000, () => {
-  console.log('Server started!');
+app.listen(PORT, () => {
+  console.log(`Server listening on ${PORT}`);
 });
