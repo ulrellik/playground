@@ -33,10 +33,7 @@ app.use(express.static(__dirname + '/public'));
 
 
 app.get('/', (req, res) => {
-  res.send({
-    name: 'Jerome',
-    age: '31'
-  });
+  res.send('Hello');
 });
 
 app.get('/about', (req, res) => {
@@ -48,3 +45,5 @@ app.get('/about', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server listening on ${PORT}`);
 });
+
+module.exports.app = app;

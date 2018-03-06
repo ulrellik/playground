@@ -11,9 +11,13 @@
     "request": "^2.83.0",
     "yargs": "^11.0.0"
   },
-  "devDependencies": {},
+  "devDependencies": {
+    "jest": "^22.4.2",
+    "mocha": "^5.0.1"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "jest --watch **/*.test.js",
+    "test-watch": "nodemon --legacy-watch --exec \"npm test\"",
     "start": "node server.js"
   },
   "author": "Jerome",
