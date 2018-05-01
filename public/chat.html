@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+</head>
+<body>
+  <p>Users</p>
+  <div id="users">
+
+  </div>
+
+  <ol id="stack"></ol>
+
+  <form id="chatter">
+    <input name="input" type="text" placeholder="message"/>
+    <button>Send</button>
+  </form>
+
+  <script id="template" type="text/template">
+    <li>{{msg}}</li>
+  </script>
+
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="jquery-3.3.1.min.js"></script>
+  <script src="mustache.js"></script>
+  <script src="deparam.js"></script>
+  <script>
+    var socket = io();
+    socket.on('connect', () => {
+      socket.emit('join', $.deparam(window.location.search), (err) => {
+        if (err) {
+          alert(err);
+          window.location.href = '/';
+        } else {
+          alert('joined!')
+        }
+
+      });
+    });
+
+    socket.on('chat message', (msg) => {
+      $('#stack').append(Mustache.render($('#template').html(), {msg}));
+    });
+
+    socket.on('userlist', (users) => {
+      let $ol = $('<ol></ol>');
+      users.forEach((user) => $('<li></li>').text(user).appendTo($ol));
+      $('#users').html($ol);
+    });
+
+    $('#chatter').on('submit', (e) => {
+      e.preventDefault();
+      socket.emit('chat message', $('[name=input]').val(), (data) => console.log(data));
+    });
+  </script>
+</body>
+</html>

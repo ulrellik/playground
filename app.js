@@ -1,51 +1,46 @@
-// sudo docker run -it --rm --name node -v /vagrant/node:/usr/src/app -w /usr/src/app --expose=9229 -p 9229:9229 node:9.5.0 node --inspect-brk=172.17.0.2:9229 app.js
+var express = require('express');
+var path = require('path');
+var favicon = require('serve-favicon');
+var logger = require('morgan');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
 
+var index = require('./routes/index');
+var users = require('./routes/users');
 
-const fs = require('fs');
-const _ = require('lodash');
-const yargs = require('yargs');
-const request = require('request');
-const axios = require('axios');
+var app = express();
 
-const notes = require('./notes.js');
-const geocode = require('./geocode.js');
+// view engine setup
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'hbs');
 
-var address = yargs.options({
-    address: {
-      demand: true,
-      default: '131 rue du Faubourg Kayl',
-      alias: 'a',
-      type: 'string'
-    }
-  })
-  .help()
-  .argv.address;
+// uncomment after placing your favicon in /public
+//app.use(favicon(path.join(__dirname, 'public', 'favicon.ico')));
+app.use(logger('dev'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
 
-var geocodeAddress = (address) => {
-  return new Promise((resolve, reject) => {
-    request({
-      url: `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}`,
-      json: true
-    }, (error, response, body) => {
-      console.log(response);
-      if (error) {
-        reject(error);
-      } else if (body.status !== 'OK') {
-        reject(body.status);
-      } else {
-        resolve({
-          latitude: body.results[0].geometry.location.lat,
-          longitude: body.results[0].geometry.location.lng
-        });
-      }
-    });
-  })
-}
+app.use('/', index);
+app.use('/users', users);
 
-geocodeAddress(address).then((result) => {
-  console.log(result);
-}).catch((error) => {
-  console.log(error);
-})
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+  var err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
 
-// geocode.geocodeAddress(address, result => console.log(result));
+// error handler
+app.use(function(err, req, res, next) {
+  // set locals, only providing error in development
+  res.locals.message = err.message;
+  res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+  // render the error page
+  res.status(err.status || 500);
+  res.render('error');
+});
+
+module.exports = app;
